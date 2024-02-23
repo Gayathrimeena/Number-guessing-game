@@ -1,0 +1,96 @@
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
+import java.util.Random;
+
+public class App extends Application {
+
+    private int randomNumber;
+    private int attemptsLeft;
+    private int score;
+
+    private Label attemptsLabel;
+    private Label resultLabel;
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Number Guessing Game");
+
+        // Generate a random number
+        generateRandomNumber();
+
+        // UI components
+        Label titleLabel = new Label("Guess the Number Game");
+        Label instructionLabel = new Label("Guess a number between 1 and 100:");
+        TextField guessField = new TextField();
+        Button guessButton = new Button("Guess");
+        attemptsLabel = new Label();
+        resultLabel = new Label();
+        Button playAgainButton = new Button("Play Again");
+
+        // Layout setup
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10));
+        layout.getChildren().addAll(titleLabel, instructionLabel, guessField, guessButton, attemptsLabel, resultLabel, playAgainButton);
+
+        // Event handlers
+        guessButton.setOnAction(event -> {
+            if (guessField.getText().isEmpty()) {
+                resultLabel.setText("Please enter a number.");
+                return;
+            }
+            int guess = Integer.parseInt(guessField.getText());
+            checkGuess(guess);
+            guessField.clear();
+        });
+
+        playAgainButton.setOnAction(event -> {
+            generateRandomNumber();
+            resetGame();
+            resultLabel.setText("");
+        });
+
+        // Scene setup
+        Scene scene = new Scene(layout, 300, 200);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void generateRandomNumber() {
+        Random random = new Random();
+        randomNumber = random.nextInt(100) + 1;
+    }
+
+    private void checkGuess(int guess) {
+        if (guess == randomNumber) {
+            resultLabel.setText("Congratulations! You guessed the number.");
+            score++;
+        } else if (guess < randomNumber) {
+            resultLabel.setText("Too low. Try again.");
+        } else {
+            resultLabel.setText("Too high. Try again.");
+        }
+        attemptsLeft--;
+        updateAttemptsLabel();
+        if (attemptsLeft == 0 && guess != randomNumber) {
+            resultLabel.setText("Out of attempts. The number was: " + randomNumber);
+        }
+    }
+
+    private void resetGame() {
+        attemptsLeft = 5;
+        updateAttemptsLabel();
+    }
+
+    private void updateAttemptsLabel() {
+        attemptsLabel.setText("Attempts left: " + attemptsLeft);
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
